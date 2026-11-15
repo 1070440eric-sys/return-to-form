@@ -24,8 +24,11 @@
     notes: document.getElementById('notes'),
     notesList: document.getElementById('notes-list'),
     notesCount: document.getElementById('notes-count'),
-    reset: document.getElementById('reset')
+    reset: document.getElementById('reset'),
+    back: document.getElementById('back')
   };
+
+  var HISTORY_LIMIT = 200;
 
   /* ── 存檔 ── */
 
@@ -35,7 +38,7 @@
       states: [],     // 這一輪發生過的事，返回就清掉
       clues: [],      // 玩家記得的事，死了也留著
       loop: 1,
-      checkpoint: null // 做出上一個選擇之前的位置，死了回到這裡
+      history: []     // 走過的每一步（場景和當時的狀態），返回時一步一步往回退
     };
   }
 
@@ -50,12 +53,13 @@
       base.states = Array.isArray(saved.states) ? saved.states : [];
       base.clues = Array.isArray(saved.clues) ? saved.clues : [];
       base.loop = typeof saved.loop === 'number' ? saved.loop : 1;
-      if (saved.checkpoint && STORY.scenes[saved.checkpoint.scene]) {
-        base.checkpoint = {
-          scene: saved.checkpoint.scene,
-          states: Array.isArray(saved.checkpoint.states) ? saved.checkpoint.states : []
-        };
-      }
+      var steps = Array.isArray(saved.history) ? saved.history : [];
+      if (!steps.length && saved.checkpoint) steps = [saved.checkpoint]; // 舊版存檔
+      base.history = steps
+        .filter(function (step) { return step && STORY.scenes[step.scene]; })
+        .map(function (step) {
+          return { scene: step.scene, states: Array.isArray(step.states) ? step.states : [] };
+        });
       return base;
     } catch (e) {
       return freshGame();
@@ -116,7 +120,8 @@
   }
 
   function choose(choice) {
-    game.checkpoint = { scene: game.scene, states: game.states.slice() };
+    game.history.push({ scene: game.scene, states: game.states.slice() });
+    if (game.history.length > HISTORY_LIMIT) game.history.shift();
     addAll(game.states, choice.set);
     var fresh = addAll(game.clues, choice.learn);
     fresh = fresh.concat(enter(choice.to));
@@ -124,20 +129,29 @@
     render(fresh);
   }
 
-  // 死亡後返回：回到做出致命選擇的那個場景，狀態還原，線索保留。
-  function comeBack() {
-    var cp = game.checkpoint;
-    game.loop += 1;
-    if (cp && STORY.scenes[cp.scene]) {
-      game.scene = cp.scene;
-      game.states = cp.states.slice();
+  // 返回上一步：回到做出上一個選擇之前的場景，狀態還原，線索保留。
+  // 沒死也能用。死亡後的返回會多算一輪。
+  function stepBack(countLoop) {
+    var step = game.history.pop();
+    if (countLoop) game.loop += 1;
+    if (step && STORY.scenes[step.scene]) {
+      game.scene = step.scene;
+      game.states = step.states.slice();
     } else {
       game.scene = STORY.start;
       game.states = [];
     }
-    game.checkpoint = null;
     save();
     render([]);
+  }
+
+  function comeBack() {
+    stepBack(true);
+  }
+
+  function goBack() {
+    if (!game.history.length) return;
+    stepBack(false);
   }
 
   // 世界結束或路線未完成：回到開場，狀態清空，線索保留。
@@ -145,7 +159,7 @@
     game.loop += 1;
     game.scene = STORY.start;
     game.states = [];
-    game.checkpoint = null;
+    game.history = [];
     enter(STORY.start);
     save();
     render([]);
@@ -221,6 +235,10 @@
 
     el.loop.textContent = game.loop > 1 ? '第 ' + game.loop + ' 輪' : '';
     el.notesCount.textContent = game.clues.length ? String(game.clues.length) : '';
+    // 死亡、世界結束、未完成的場景已經有自己的大按鈕，下方的返回鍵就不重複顯示
+    var ownButton = scene.death || scene.worldEnd || scene.stub;
+    el.back.hidden = !!ownButton;
+    el.back.disabled = game.history.length === 0;
     disarmReset();
 
     var first = el.choices.querySelector('button');
@@ -283,6 +301,7 @@
     if (e.key === 'Escape' && !el.notes.hidden) closeNotes();
   });
   el.reset.addEventListener('click', onReset);
+  el.back.addEventListener('click', goBack);
 
   /* ── 開始 ── */
 

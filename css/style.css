@@ -159,6 +159,8 @@ body {
 .bottom {
   display: flex;
   justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
   padding-top: 1rem;
   border-top: 1px solid var(--rule);
 }
@@ -175,6 +177,12 @@ body {
 .link:hover,
 .link:focus-visible { color: var(--amber); outline: none; }
 .link.quiet { opacity: 0.6; }
+.link.back { color: var(--paper); }
+.link.back:hover,
+.link.back:focus-visible { color: var(--amber); }
+.link[hidden] { visibility: hidden; display: inline-block; }
+.link:disabled { opacity: 0.3; cursor: default; }
+.link:disabled:hover { color: var(--paper-dim); }
 .link.armed { color: var(--blood); opacity: 1; }
 .count { margin-left: 0.5rem; color: var(--amber); }
 
