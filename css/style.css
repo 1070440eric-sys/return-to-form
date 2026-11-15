@@ -1,0 +1,234 @@
+:root {
+  --ink: #14110f;
+  --ink-raised: #1d1916;
+  --paper: #e9e0d1;
+  --paper-dim: #a39a8b;
+  --rule: #3a332c;
+  --amber: #c9a25e;
+  --blood: #b5483c;
+  --measure: 34rem;
+  --serif: "Noto Serif TC", "Songti TC", "PMingLiU", "Source Han Serif TC", serif;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--serif);
+  font-size: 1.125rem;
+  line-height: 1.9;
+  letter-spacing: 0.02em;
+}
+
+.page {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 1.5rem 1.5rem 3rem;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 頁首 */
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.8125rem;
+  color: var(--paper-dim);
+}
+.brand-en {
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.brand-zh {
+  margin-left: 0.75rem;
+  color: var(--amber);
+  letter-spacing: 0.3em;
+}
+.loop { white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+/* 場景 */
+.scene {
+  flex: 1;
+  padding: 3.5rem 0 2rem;
+}
+.scene.enter { animation: rise 0.45s ease-out both; }
+@keyframes rise {
+  from { opacity: 0; transform: translateY(0.5rem); }
+  to { opacity: 1; transform: none; }
+}
+
+.kicker {
+  margin: 0 0 0.5rem;
+  min-height: 1.5rem;
+  font-size: 0.8125rem;
+  letter-spacing: 0.35em;
+  color: var(--blood);
+}
+.scene-title {
+  margin: 0 0 2rem;
+  font-size: 1.75rem;
+  font-weight: 900;
+  line-height: 1.35;
+  letter-spacing: 0.08em;
+}
+.scene-text p { margin: 0 0 1.25rem; }
+
+.is-death .scene-title { color: var(--blood); }
+.is-end .scene-title { color: var(--amber); }
+
+/* 新記下的線索 */
+.learned {
+  list-style: none;
+  margin: 2rem 0 0;
+  padding: 0;
+}
+.learned li {
+  padding: 0.75rem 1rem;
+  border-left: 2px solid var(--amber);
+  background: var(--ink-raised);
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  color: var(--paper);
+}
+.learned li + li { margin-top: 0.5rem; }
+.learned li::before {
+  content: "記下了";
+  display: block;
+  font-size: 0.75rem;
+  letter-spacing: 0.3em;
+  color: var(--amber);
+}
+
+/* 選項 */
+.choices {
+  margin-top: 2.5rem;
+  display: grid;
+  gap: 0.75rem;
+}
+.choice {
+  display: block;
+  width: 100%;
+  padding: 0.875rem 1.125rem;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  background: transparent;
+  color: var(--paper);
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1.6;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s, transform 0.15s;
+}
+.choice:hover,
+.choice:focus-visible {
+  border-color: var(--amber);
+  background: var(--ink-raised);
+  transform: translateX(0.25rem);
+  outline: none;
+}
+.choice.gated {
+  border-color: var(--amber);
+  color: var(--amber);
+}
+.choice.gated::after {
+  content: "　因為你記得";
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  opacity: 0.75;
+}
+.choice.return {
+  border-color: var(--blood);
+  color: var(--paper);
+  text-align: center;
+  letter-spacing: 0.5em;
+  text-indent: 0.5em;
+}
+
+/* 頁尾 */
+.bottom {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+}
+.link {
+  padding: 0.25rem 0;
+  border: 0;
+  background: none;
+  color: var(--paper-dim);
+  font: inherit;
+  font-size: 0.875rem;
+  letter-spacing: 0.15em;
+  cursor: pointer;
+}
+.link:hover,
+.link:focus-visible { color: var(--amber); outline: none; }
+.link.quiet { opacity: 0.6; }
+.link.armed { color: var(--blood); opacity: 1; }
+.count { margin-left: 0.5rem; color: var(--amber); }
+
+/* 線索筆記 */
+.notes {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background: rgba(10, 8, 7, 0.82);
+}
+.notes[hidden] { display: none; }
+.notes-inner {
+  width: 100%;
+  max-width: 30rem;
+  max-height: 80vh;
+  overflow: auto;
+  padding: 2rem 1.75rem 1.5rem;
+  border: 1px solid var(--rule);
+  background: var(--ink-raised);
+}
+.notes-inner h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  letter-spacing: 0.2em;
+  color: var(--amber);
+}
+.notes-hint {
+  margin: 0.25rem 0 1.5rem;
+  font-size: 0.8125rem;
+  color: var(--paper-dim);
+}
+.notes-list {
+  margin: 0 0 1.5rem;
+  padding: 0;
+  list-style: none;
+  font-size: 0.9375rem;
+  line-height: 1.75;
+}
+.notes-list li {
+  padding: 0.75rem 0;
+  border-top: 1px solid var(--rule);
+}
+.notes-list .empty { color: var(--paper-dim); }
+
+@media (max-width: 30rem) {
+  body { font-size: 1.0625rem; }
+  .page { padding: 1rem 1.125rem 2rem; }
+  .scene { padding-top: 2.25rem; }
+  .scene-title { font-size: 1.5rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene.enter { animation: none; }
+  .choice { transition: none; }
+}

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Return to Form｜異界</title>
+  <meta name="description" content="一款會死很多次的文字遊戲。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="page">
+    <header class="top">
+      <div class="brand">
+        <span class="brand-en" id="game-title">Return to Form</span>
+        <span class="brand-zh" id="game-subtitle">異界</span>
+      </div>
+      <div class="loop" id="loop" aria-live="polite"></div>
+    </header>
+
+    <main class="scene" id="scene" aria-live="polite">
+      <p class="kicker" id="kicker"></p>
+      <h1 class="scene-title" id="scene-title"></h1>
+      <div class="scene-text" id="scene-text"></div>
+      <ul class="learned" id="learned"></ul>
+      <div class="choices" id="choices"></div>
+    </main>
+
+    <footer class="bottom">
+      <button type="button" class="link" id="open-notes">線索筆記<span class="count" id="notes-count"></span></button>
+      <button type="button" class="link quiet" id="reset">全部重來</button>
+    </footer>
+  </div>
+
+  <aside class="notes" id="notes" hidden>
+    <div class="notes-inner" role="dialog" aria-modal="true" aria-labelledby="notes-heading">
+      <h2 id="notes-heading">線索筆記</h2>
+      <p class="notes-hint">這些是你記得的事。死了也帶得走。</p>
+      <ul class="notes-list" id="notes-list"></ul>
+      <button type="button" class="link" id="close-notes">關上</button>
+    </div>
+  </aside>
+
+  <noscript>這個遊戲需要開啟 JavaScript 才能玩。</noscript>
+  <script src="js/story.js"></script>
+  <script src="js/engine.js"></script>
+</body>
+</html>
