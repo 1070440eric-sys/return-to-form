@@ -20,12 +20,20 @@
       <div class="loop" id="loop" aria-live="polite"></div>
     </header>
 
-    <main class="scene" id="scene" aria-live="polite">
-      <p class="kicker" id="kicker"></p>
-      <h1 class="scene-title" id="scene-title"></h1>
-      <div class="scene-text" id="scene-text"></div>
-      <ul class="learned" id="learned"></ul>
-      <div class="choices" id="choices"></div>
+    <main class="scene" id="scene">
+      <div class="place">
+        <p class="kicker" id="kicker"></p>
+        <h1 class="scene-title" id="scene-title"></h1>
+      </div>
+      <div class="panel">
+        <div class="scene-text" id="scene-text" aria-live="polite"></div>
+        <div class="reveal-bar" id="reveal-bar" hidden>
+          <span class="hint">點擊畫面繼續</span>
+          <button type="button" class="link" id="skip">全部顯示</button>
+        </div>
+        <ul class="learned" id="learned"></ul>
+        <div class="choices" id="choices"></div>
+      </div>
     </main>
 
     <footer class="bottom">
