@@ -168,13 +168,11 @@
     render([]);
   }
 
-  function comeBack() {
-    stepBack(true);
-  }
-
+  // 下方的「返回上一步」。在死亡或世界結束的畫面按，也算多一輪。
   function goBack() {
     if (!game.history.length) return;
-    stepBack(false);
+    var scene = STORY.scenes[game.scene];
+    stepBack(!!(scene.death || scene.worldEnd));
   }
 
   // 世界結束或路線未完成：回到開場，狀態清空，成就保留。
@@ -338,8 +336,7 @@
 
     el.loop.textContent = game.loop > 1 ? '第 ' + game.loop + ' 輪' : '';
     el.notesCount.textContent = game.clues.length ? String(game.clues.length) : '';
-    var ownButton = scene.death || scene.worldEnd || scene.stub;
-    el.back.hidden = !!ownButton;
+    el.back.hidden = false;
     el.back.disabled = game.history.length === 0;
     disarmReset();
     window.scrollTo(0, 0);
@@ -369,7 +366,7 @@
     });
 
     if (scene.death) {
-      el.choices.appendChild(button('返回', 'choice return', comeBack));
+      el.choices.appendChild(button('返回', 'choice return', startOver));
     } else if (scene.worldEnd) {
       el.choices.appendChild(button('返回', 'choice return', startOver));
     } else if (scene.stub) {
