@@ -31,6 +31,7 @@
     notes: document.getElementById('notes'),
     notesList: document.getElementById('notes-list'),
     notesCount: document.getElementById('notes-count'),
+    notesTally: document.getElementById('notes-tally'),
     reset: document.getElementById('reset'),
     back: document.getElementById('back')
   };
@@ -45,7 +46,7 @@
     return {
       scene: STORY.start,
       states: [],     // 這一輪發生過的事，返回就清掉
-      clues: [],      // 玩家記得的事，死了也留著
+      clues: [],      // 解鎖的成就（玩家記得的事），死了也留著
       loop: 1,
       history: [],    // 走過的每一步（場景和當時的狀態），返回時一步一步往回退
       seen: []        // 看完過的場景，再進來時文字直接顯示
@@ -97,6 +98,13 @@
     return String(text).replace(/\{noble\}/g, STORY.noble);
   }
 
+  function clueInfo(key) {
+    var c = STORY.clues[key];
+    if (!c) return { name: key, text: '' };
+    if (typeof c === 'string') return { name: c, text: '' };
+    return { name: fill(c.name || key), text: fill(c.text || '') };
+  }
+
   function has(key) {
     return game.clues.indexOf(key) !== -1 || game.states.indexOf(key) !== -1;
   }
@@ -126,7 +134,7 @@
 
   /* ── 遊戲流程 ── */
 
-  // 進入一個場景。回傳這次新記下的線索。
+  // 進入一個場景。回傳這次新解鎖的成就。
   function enter(id) {
     var scene = STORY.scenes[id];
     game.scene = id;
@@ -144,7 +152,7 @@
     render(fresh);
   }
 
-  // 返回上一步：回到做出上一個選擇之前的場景，狀態還原，線索保留。
+  // 返回上一步：回到做出上一個選擇之前的場景，狀態還原，成就保留。
   // 沒死也能用。死亡後的返回會多算一輪。
   function stepBack(countLoop) {
     var step = game.history.pop();
@@ -169,7 +177,7 @@
     stepBack(false);
   }
 
-  // 世界結束或路線未完成：回到開場，狀態清空，線索保留。
+  // 世界結束或路線未完成：回到開場，狀態清空，成就保留。
   function startOver() {
     game.loop += 1;
     game.scene = STORY.start;
@@ -357,9 +365,7 @@
     }
 
     (freshClues || []).forEach(function (key) {
-      var li = document.createElement('li');
-      li.textContent = fill(STORY.clues[key] || key);
-      el.learned.appendChild(li);
+      el.learned.appendChild(achievementItem(key));
     });
 
     if (scene.death) {
@@ -384,18 +390,35 @@
     if (first && focusChoices) first.focus({ preventScroll: true });
   }
 
-  function renderNotes() {
-    el.notesList.textContent = '';
-    if (!game.clues.length) {
-      var empty = document.createElement('li');
-      empty.className = 'empty';
-      empty.textContent = '還沒有記下任何事。';
-      el.notesList.appendChild(empty);
-      return;
+  function achievementItem(key) {
+    var info = clueInfo(key);
+    var li = document.createElement('li');
+    var name = document.createElement('strong');
+    name.className = 'ach-name';
+    name.textContent = info.name;
+    li.appendChild(name);
+    if (info.text) {
+      var text = document.createElement('span');
+      text.className = 'ach-text';
+      text.textContent = info.text;
+      li.appendChild(text);
     }
+    return li;
+  }
+
+  function renderNotes() {
+    var all = Object.keys(STORY.clues);
+    el.notesTally.textContent = game.clues.length + ' / ' + all.length;
+    el.notesList.textContent = '';
+    // 已解鎖的照解鎖順序排在前面，沒解鎖的只顯示問號
     game.clues.forEach(function (key) {
+      if (STORY.clues[key]) el.notesList.appendChild(achievementItem(key));
+    });
+    all.forEach(function (key) {
+      if (game.clues.indexOf(key) !== -1) return;
       var li = document.createElement('li');
-      li.textContent = fill(STORY.clues[key] || key);
+      li.className = 'locked';
+      li.textContent = '？？？';
       el.notesList.appendChild(li);
     });
   }
@@ -403,7 +426,8 @@
   function openNotes() {
     renderNotes();
     el.notes.hidden = false;
-    el.closeNotes.focus();
+    el.closeNotes.focus({ preventScroll: true });
+    el.notesList.parentNode.scrollTop = 0;
   }
 
   function closeNotes() {
@@ -421,7 +445,7 @@
   function onReset() {
     if (!resetArmed) {
       resetArmed = true;
-      el.reset.textContent = '線索也會清掉，再按一次確定';
+      el.reset.textContent = '成就也會清掉，再按一次確定';
       el.reset.classList.add('armed');
       return;
     }

@@ -30,7 +30,7 @@ const checkKeys = (where, keys, table, kind) => {
 for (const [id, scene] of Object.entries(scenes)) {
   if (!scene.title) problems.push(`場景 ${id} 沒有 title`);
   if (!Array.isArray(scene.text) || scene.text.length === 0) problems.push(`場景 ${id} 沒有 text`);
-  checkKeys(`場景 ${id}`, scene.learn, story.clues, '線索');
+  checkKeys(`場景 ${id}`, scene.learn, story.clues, '成就');
   checkKeys(`場景 ${id}`, scene.set, story.states, '狀態');
 
   const terminal = scene.death || scene.worldEnd || scene.stub;
@@ -48,7 +48,7 @@ for (const [id, scene] of Object.entries(scenes)) {
     const where = `場景 ${id} 的第 ${i + 1} 個選項`;
     if (!choice.label) problems.push(`${where} 沒有 label`);
     if (!scenes[choice.to]) problems.push(`${where} 指到不存在的場景「${choice.to}」`);
-    checkKeys(where, choice.learn, story.clues, '線索');
+    checkKeys(where, choice.learn, story.clues, '成就');
     checkKeys(where, choice.set, story.states, '狀態');
     [...(choice.needs || []), ...(choice.hideIf || [])].forEach((key) => {
       if (!known.has(key)) problems.push(`${where} 的條件用到沒定義的「${key}」`);
@@ -75,8 +75,11 @@ Object.values(scenes).forEach((scene) => {
   (scene.learn || []).forEach((k) => learnable.add(k));
   (scene.choices || []).forEach((c) => (c.learn || []).forEach((k) => learnable.add(k)));
 });
+Object.entries(story.clues).forEach(([key, c]) => {
+  if (typeof c !== 'string' && !(c && c.name)) problems.push(`成就「${key}」沒有 name`);
+});
 Object.keys(story.clues).forEach((key) => {
-  if (!learnable.has(key)) problems.push(`線索「${key}」沒有任何場景會記下它`);
+  if (!learnable.has(key)) problems.push(`成就「${key}」沒有任何場景會解鎖它`);
 });
 
 const count = Object.keys(scenes).length;
@@ -85,4 +88,4 @@ if (problems.length) {
   problems.forEach((p) => console.log(' - ' + p));
   process.exit(1);
 }
-console.log(`沒有問題。共 ${count} 個場景、${Object.keys(story.clues).length} 條線索。`);
+console.log(`沒有問題。共 ${count} 個場景、${Object.keys(story.clues).length} 個成就。`);

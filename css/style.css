@@ -156,7 +156,7 @@ body {
 }
 .learned li + li { margin-top: 0.5rem; }
 .learned li::before {
-  content: "記下了";
+  content: "解鎖成就";
   display: block;
   font-size: 0.75rem;
   letter-spacing: 0.3em;
@@ -298,7 +298,12 @@ body {
   padding: 0.75rem 0;
   border-top: 1px solid var(--rule);
 }
-.notes-list .empty { color: var(--paper-dim); }
+.notes-list .locked { padding: 0.4rem 0; color: var(--paper-dim); opacity: 0.5; letter-spacing: 0.3em; }
+.ach-name { display: block; font-weight: 600; }
+.ach-text { display: block; font-size: 0.875rem; color: var(--paper-dim); }
+.learned .ach-name { color: var(--paper); }
+.learned .ach-text { color: var(--paper); opacity: 0.85; }
+.tally { margin-left: 0.5rem; font-size: 0.875rem; letter-spacing: 0.1em; color: var(--paper-dim); }
 
 @media (max-width: 30rem) {
   body { font-size: 1.0625rem; }
